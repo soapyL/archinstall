@@ -10,7 +10,7 @@ lsblk
 echo "Please enter which drive to use: "
 read drive
 
-if [ ! -b "$drive" ]; then
+if [ ! -b "/dev/${drive}" ]; then
     handle_error "Drive does not exist"
 fi
 
