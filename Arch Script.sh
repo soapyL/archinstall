@@ -7,7 +7,7 @@ handle_error() {
 }
 
 # Set keyboard layout
-localectl set-keymap gb || handle_error "Failed to set keyboard layout."
+localectl set-keymap uk || handle_error "Failed to set keyboard layout."
 loadkeys gb || handle_error "Failed to load keyboard layout."
 
 # Check firmware size
