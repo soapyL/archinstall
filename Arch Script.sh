@@ -6,6 +6,14 @@ handle_error() {
     exit 1
 }
 
+lsblk
+echo "Please enter which drive to use: "
+read drive
+
+if [ ! -b "$drive" ]; then
+    handle_error "Drive does not exist"
+fi
+
 # Set keyboard layout
 localectl set-keymap uk || handle_error "Failed to set keyboard layout."
 loadkeys uk || handle_error "Failed to load keyboard layout."
@@ -27,16 +35,16 @@ if mount | grep /mnt > /dev/null; then
 fi
 
 # Delete existing partitions and create new ones
-echo -e "g\nn\n\n\n+512M\nt\n1\nn\n\n\n\nw" | fdisk /dev/nvme0n1 || handle_error "Failed to partition the disk."
+echo -e "g\nn\n\n\n+512M\nt\n1\nn\n\n\n\nw" | fdisk "$drive" || handle_error "Failed to partition the disk."
 
 # Format partitions
-mkfs.ext4 /dev/nvme0n1p2 || handle_error "Failed to format root partition."
-mkfs.fat -F32 /dev/nvme0n1p1 || handle_error "Failed to format boot partition."
+mkfs.ext4 "${drive}p2" || handle_error "Failed to format root partition."
+mkfs.fat -F32 "${drive}p1" || handle_error "Failed to format boot partition."
 
 # Mount partitions
-mount /dev/nvme0n1p2 /mnt || handle_error "Failed to mount root partition."
+mount "${drive}p2" /mnt || handle_error "Failed to mount root partition."
 mkdir -p /mnt/boot/efi || handle_error "Failed to create boot directory."
-mount /dev/nvme0n1p1 /mnt/boot/efi || handle_error "Failed to mount boot partition."
+mount "${drive}p1" /mnt/boot/efi || handle_error "Failed to mount boot partition."
 
 # Install Arch Linux base system
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
