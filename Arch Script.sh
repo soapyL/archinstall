@@ -35,16 +35,16 @@ if mount | grep /mnt > /dev/null; then
 fi
 
 # Delete existing partitions and create new ones
-echo -e "g\nn\n\n\n+512M\nt\n1\nn\n\n\n\nw" | fdisk "/dev/${drive}" || handle_error "Failed to partition the disk."
+echo -e "g\nn\n\n\n+512M\nt\n1\nn\n\n\n\nw" | fdisk "/dev/${drive}" | echo "Disks partitioned." || handle_error "Failed to partition the disk."
 
 # Format partitions
-mkfs.ext4 "/dev/${drive}/p2" || handle_error "Failed to format root partition."
-mkfs.fat -F32 "/dev/${drive}/p1" || handle_error "Failed to format boot partition."
+mkfs.ext4 "/dev/${drive}p2" || handle_error "Failed to format root partition."
+mkfs.fat -F32 "/dev/${drive}p1" || handle_error "Failed to format boot partition."
 
 # Mount partitions
-mount "/dev/${drive}/p2" /mnt || handle_error "Failed to mount root partition."
+mount "/dev/${drive}p2" /mnt || handle_error "Failed to mount root partition."
 mkdir -p /mnt/boot/efi || handle_error "Failed to create boot directory."
-mount "/dev/${drive}/p1" /mnt/boot/efi || handle_error "Failed to mount boot partition."
+mount "/dev/${drive}p1" /mnt/boot/efi || handle_error "Failed to mount boot partition."
 
 # Install Arch Linux base system
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
