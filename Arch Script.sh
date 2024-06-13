@@ -8,7 +8,7 @@ handle_error() {
 
 # Set keyboard layout
 localectl set-keymap uk || handle_error "Failed to set keyboard layout."
-loadkeys gb || handle_error "Failed to load keyboard layout."
+loadkeys uk || handle_error "Failed to load keyboard layout."
 
 # Check firmware size
 fw_size=$(cat /sys/firmware/efi/fw_platform_size)
