@@ -54,12 +54,19 @@ mkfs.fat -F32 "$efi_partition" || handle_error "Failed to format boot partition.
 
 # Mount partitions
 mount "$root_partition" /mnt || handle_error "Failed to mount root partition."
-mkdir -p /mnt/boot/efi || handle_error "Failed to create boot directory."
-mount "$efi_partition" /mnt/boot/efi || handle_error "Failed to mount boot partition."
+mkdir -p /mnt/boot || handle_error "Failed to create boot directory."
+mount "$efi_partition" /mnt/boot || handle_error "Failed to mount boot partition."
 
 # Install Arch Linux base system
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
-rankmirrors -n 6 /etc/pacman.d/mirrorlist.backup > /etc/pacman.d/mirrorlist || handle_error "Failed to rank mirrors."
+
+# Install reflector package which includes rankmirrors
+pacman -Sy reflector --noconfirm || handle_error "Failed to install reflector."
+
+# Use reflector to rank mirrors
+reflector --verbose -l 5 --sort rate --save /etc/pacman.d/mirrorlist || handle_error "Failed to rank mirrors."
+
+# Install packages
 pacstrap /mnt base linux linux-lts linux-firmware amd-ucode networkmanager nano grub efibootmgr || handle_error "Failed to install Arch Linux base system."
 
 # Generate fstab
@@ -84,7 +91,7 @@ echo "luttus" > /etc/hostname
 echo "root:asd123" | chpasswd || handle_error "Failed to set root password."
 
 # Install GRUB bootloader
-grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB || handle_error "Failed to install GRUB bootloader."
+grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB || handle_error "Failed to install GRUB bootloader."
 grub-mkconfig -o /boot/grub/grub.cfg || handle_error "Failed to generate GRUB configuration."
 
 # Enable NetworkManager service
