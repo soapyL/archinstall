@@ -14,15 +14,17 @@ if [ ! -b "/dev/${drive}" ]; then
     handle_error "Drive does not exist"
 fi
 
+if [[ "$drive" == nvme* ]]; then
+    drive_type="nvme"
+elif [[ "$drive" == sd* ]]; then
+    drive_type="sda"
+else
+    handle_error "Unsupported drive tpye"
+fi
+
 # Set keyboard layout
 localectl set-keymap uk || handle_error "Failed to set keyboard layout."
 loadkeys uk || handle_error "Failed to load keyboard layout."
-
-# Check firmware size
-fw_size=$(cat /sys/firmware/efi/fw_platform_size)
-if [ "$fw_size" -ne 64 ]; then
-    handle_error "Firmware size is not 64-bit, please check your system."
-fi
 
 # Connect to internet
 iwctl station wlan0 connect BTWholeHome-X5H --passphrase LVUhrgUJ9puM || handle_error "Failed to connect to the internet."
@@ -34,17 +36,26 @@ if mount | grep /mnt > /dev/null; then
     umount -R /mnt || handle_error "Failed to unmount existing partitions."
 fi
 
-# Delete existing partitions and create new ones
-echo -e "g\nn\n\n\n+512M\nt\n1\nn\n\n\n\nw" | fdisk "/dev/${drive}" | echo "Disks partitioned." || handle_error "Failed to partition the disk."
+if [ "$drive_type" == "nvme" ]; then
+    echo -e "g\nn\n\n\n+512M\nt\n1\nn\n\n\n\nw" | fdisk "/dev/${drive}" || handle_error "Failed to partition the disk."
+    root_partition="/dev/${drive}p2"
+    efi_partition="/dev/${drive}p1"
+elif [ "$drive_type" == "sda" ]; then
+    echo -e "g\nn\n\n\n+512M\nt\n1\nn\n\n\n\nw" | fdisk "/dev/${drive}" || handle_error "Failed to partition the disk."
+    root_partition="/dev/${drive}2"
+    efi_partition="/dev/${drive}1"
+else
+    handle_error "Unsupported drive type. Only nvme and sda drives are supported."
+fi
 
 # Format partitions
-mkfs.ext4 "/dev/${drive}p2" || handle_error "Failed to format root partition."
-mkfs.fat -F32 "/dev/${drive}p1" || handle_error "Failed to format boot partition."
+mkfs.ext4 "$root_partition" || handle_error "Failed to format root partition."
+mkfs.fat -F32 "$efi_partition" || handle_error "Failed to format boot partition."
 
 # Mount partitions
-mount "/dev/${drive}p2" /mnt || handle_error "Failed to mount root partition."
+mount "$root_partition" /mnt || handle_error "Failed to mount root partition."
 mkdir -p /mnt/boot/efi || handle_error "Failed to create boot directory."
-mount "/dev/${drive}p1" /mnt/boot/efi || handle_error "Failed to mount boot partition."
+mount "$efi_partition" /mnt/boot/efi || handle_error "Failed to mount boot partition."
 
 # Install Arch Linux base system
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
@@ -64,7 +75,7 @@ hwclock --systohc || handle_error "Failed to sync hardware clock."
 sed -i 's/#en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen || handle_error "Failed to set locale."
 locale-gen || handle_error "Failed to generate locale."
 echo "LANG=en_GB.UTF-8" > /etc/locale.conf
-echo "KEYMAP=gb" > /etc/vconsole.conf
+echo "KEYMAP=uk" > /etc/vconsole.conf
 
 # Set hostname
 echo "luttus" > /etc/hostname
