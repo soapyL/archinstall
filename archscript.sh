@@ -96,6 +96,27 @@ grub-mkconfig -o /boot/grub/grub.cfg || handle_error "Failed to generate GRUB co
 
 # Enable NetworkManager service
 systemctl enable NetworkManager || handle_error "Failed to enable NetworkManager service."
+
+# Configure Sway
+mkdir -p ~/.config/sway
+cp /etc/sway/config ~/.config/sway/config
+
+# Enable and start SDDM
+systemctl enable sddm
+systemctl start sddm
+
+# Configure SDDM 
+echo '[General]' >> /etc/sddm.conf
+echo 'Session=sway.desktop' >> /etc/sddm.conf
+
+# Create Sway desktop entry
+mkdir -p /usr/share/wayland-sessions
+echo '[Desktop Entry]' >> /usr/share/wayland-sessions/sway.desktop
+echo 'Name=Sway' >> /usr/share/wayland-sessions/sway.desktop
+echo 'Comment=An i3-compatible Wayland compositor' >> /usr/share/wayland-sessions/sway.desktop
+echo 'Exec=sway' >> /usr/share/wayland-sessions/sway.desktop
+echo 'Type=Application' >> /usr/share/wayland-sessions/sway.desktop
+
 EOF
 
 # Unmount partitions
@@ -103,4 +124,4 @@ umount -R /mnt || handle_error "Failed to unmount partitions."
 
 # Reboot
 echo "Installation completed. Rebooting..."
-reboot
+#reboot
