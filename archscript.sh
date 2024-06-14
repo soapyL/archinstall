@@ -9,6 +9,9 @@ lsblk
 echo "Please enter which drive to use: "
 read drive
 
+echo "Please enter your system architecture: (Intel/AMD) "
+read ucodeDrivers
+
 if [ ! -b "/dev/${drive}" ]; then
     handle_error "Drive does not exist"
 fi
@@ -56,7 +59,7 @@ pacman -Sy reflector --noconfirm || handle_error "Failed to install reflector."
 
 reflector --verbose -l 5 --sort rate --save /etc/pacman.d/mirrorlist || handle_error "Failed to rank mirrors."
 
-pacstrap /mnt base linux linux-lts linux-firmware amd-ucode networkmanager nano grub efibootmgr wayland sway wl-clipboard swaybg swayidle swaylock xorg-xwayland alacritty sddm sddm-kcm thunar waybar pulseaudio pavucontrol || handle_error "Failed to install Arch Linux base system."
+pacstrap /mnt base linux linux-lts linux-firmware "${ucodeDrivers}-ucode" networkmanager nano grub efibootmgr wayland sway wl-clipboard swaybg swayidle swaylock xorg-xwayland alacritty sddm sddm-kcm thunar waybar pulseaudio pavucontrol || handle_error "Failed to install Arch Linux base system."
 
 genfstab -U /mnt >> /mnt/etc/fstab || handle_error "Failed to generate fstab."
 
