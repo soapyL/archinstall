@@ -32,11 +32,11 @@ if mount | grep /mnt > /dev/null; then
 fi
 
 if [ "$drive_type" == "nvme" ]; then
-    echo -e "g\nn\n\n\n+512M\nt\n1\nn\n\n\n\nw" | fdisk "/dev/${drive}" || handle_error "Failed to partition the disk."
+    echo -e "g\nn\n\n\n+512M\nt\n4\nn\n\n\n\nw" | fdisk "/dev/${drive}" || handle_error "Failed to partition the disk."
     root_partition="/dev/${drive}p2"
     efi_partition="/dev/${drive}p1"
 elif [ "$drive_type" == "sda" ]; then
-    echo -e "g\nn\n\n\n+512M\nt\n1\nn\n\n\n\nw" | fdisk "/dev/${drive}" || handle_error "Failed to partition the disk."
+    echo -e "g\nn\n\n\n+512M\nt\n4\nn\n\n\n\nw" | fdisk "/dev/${drive}" || handle_error "Failed to partition the disk."
     root_partition="/dev/${drive}2"
     efi_partition="/dev/${drive}1"
 else
