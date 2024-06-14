@@ -56,7 +56,7 @@ pacman -Sy reflector --noconfirm || handle_error "Failed to install reflector."
 
 reflector --verbose -l 5 --sort rate --save /etc/pacman.d/mirrorlist || handle_error "Failed to rank mirrors."
 
-pacstrap /mnt base linux linux-lts linux-firmware amd-ucode networkmanager nano grub efibootmgr wayland sway wl-clipboard swaybg swayidle swaylock xorg-server-wayland alacritty sddm sddm-kcm thunar waybar pulseaudio pavucontrol || handle_error "Failed to install Arch Linux base system."
+pacstrap /mnt base linux linux-lts linux-firmware amd-ucode networkmanager nano grub efibootmgr wayland sway wl-clipboard swaybg swayidle swaylock xwayland alacritty sddm sddm-kcm thunar waybar pulseaudio pavucontrol || handle_error "Failed to install Arch Linux base system."
 
 genfstab -U /mnt >> /mnt/etc/fstab || handle_error "Failed to generate fstab."
 
