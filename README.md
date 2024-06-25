@@ -15,5 +15,7 @@ After that, enter <code>cd archinstall</code> and run these two commands:<br>
 <code>sed -i 's/\r$//' archscript.sh</code><br>
 <code>chmod +x archscript.sh</code><br>
 
-Finally run <code>./archscript</code> and follow the on screen instructions.
+Finally run <code>./archscript</code> and follow the on screen instructions.<br>
+
+Also, I am not responsible if this breaks your system or installs Arch incorrectly, this script was made to make installing Arch easy on lots of devices at once, but is not maintained.
 </p>
