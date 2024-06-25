@@ -12,6 +12,9 @@ read drive
 echo "Please enter your system architecture: (Intel/AMD) "
 read ucodeDrivers
 
+echo "Please enter your root password: "
+read rootpswd
+
 if [ ! -b "/dev/${drive}" ]; then
     handle_error "Drive does not exist"
 fi
@@ -27,19 +30,17 @@ fi
 localectl set-keymap uk || handle_error "Failed to set keyboard layout."
 loadkeys uk || handle_error "Failed to load keyboard layout."
 
-iwctl station wlan0 connect BTWholeHome-X5H --passphrase LVUhrgUJ9puM || handle_error "Failed to connect to the internet."
-
 echo "Partitioning the disk..."
 if mount | grep /mnt > /dev/null; then
     umount -R /mnt || handle_error "Failed to unmount existing partitions."
 fi
 
 if [ "$drive_type" == "nvme" ]; then
-    echo -e "g\nn\n\n\n+512M\nt\n4\nn\n\n\n\nw" | fdisk "/dev/${drive}" || handle_error "Failed to partition the disk."
+    echo -e "g\nn\n\n\n+512M\nt\n1\nn\n\n\n\nw" | fdisk "/dev/${drive}" || handle_error "Failed to partition the disk."
     root_partition="/dev/${drive}p2"
     efi_partition="/dev/${drive}p1"
 elif [ "$drive_type" == "sda" ]; then
-    echo -e "g\nn\n\n\n+512M\nt\n4\nn\n\n\n\nw" | fdisk "/dev/${drive}" || handle_error "Failed to partition the disk."
+    echo -e "g\nn\n\n\n+512M\nt\n1\nn\n\n\n\nw" | fdisk "/dev/${drive}" || handle_error "Failed to partition the disk."
     root_partition="/dev/${drive}2"
     efi_partition="/dev/${drive}1"
 else
@@ -74,7 +75,7 @@ echo "KEYMAP=uk" > /etc/vconsole.conf
 
 echo "luttus" > /etc/hostname
 
-echo "root:asd123" | chpasswd || handle_error "Failed to set root password."
+echo "root:${rootpswd}" | chpasswd || handle_error "Failed to set root password."
 
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB || handle_error "Failed to install GRUB bootloader."
 grub-mkconfig -o /boot/grub/grub.cfg || handle_error "Failed to generate GRUB configuration."
@@ -102,4 +103,4 @@ EOF
 umount -R /mnt || handle_error "Failed to unmount partitions."
 
 echo "Installation complete. Rebooting..."
-#reboot
+reboot
