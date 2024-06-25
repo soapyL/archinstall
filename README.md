@@ -1,17 +1,19 @@
-This script automates the install of Arch Linux on  computer.
+<p>
+This script automates the install of Arch Linux on  computer.<br>
 
-It installs the Linux and Linux-LTS kernels, with Wayland, Sway and Sway extras (swaybg, swaylock, etc), as well as installing and configuring GRUB for a bootloader.
+It installs the Linux and Linux-LTS kernels, with Wayland, Sway and Sway extras (swaybg, swaylock, etc), as well as installing and configuring GRUB for a bootloader.<br>
 
-To use, boot from an Arch ISO and select install Arch Linux.
+To use, boot from an Arch ISO and select install Arch Linux.<br>
 
-Then connect to the internet via WiFi or Ethernet.
-For WiFi you can use 'iwctl station wlan0 connect {Enter SSID}', and enter the password when prompted.
+Then connect to the internet via WiFi or Ethernet.<br>
+For WiFi you can use 'iwctl station wlan0 connect {Enter SSID}', and enter the password when prompted.<br>
 
-Then run 'pacman -Sy git', enter y to any prompts, and then run:
-'git clone https://github.com/soapyL/archinstall.git'
+Then run 'pacman -Sy git', enter y to any prompts, and then run:<br>
+'git clone https://github.com/soapyL/archinstall.git'<br>
 
-After that, enter 'cd archinstall' ad run these two commands:
-'sed -i 's/\r$//' archscript.sh'
-'chmod +x archscript.sh'
+After that, enter 'cd archinstall' ad run these two commands:<br>
+'sed -i 's/\r$//' archscript.sh'<br>
+'chmod +x archscript.sh'<br>
 
 Finally run './archscript' and follow the on screen instructions.
+</p>
